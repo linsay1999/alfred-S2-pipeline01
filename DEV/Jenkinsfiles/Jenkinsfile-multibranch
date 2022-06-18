@@ -1,6 +1,6 @@
 pipeline {
     agent { 
-        label 'node1 || node2 || node3 || node4 || node5'
+        label 'linode-node'
          }
    
   
@@ -44,7 +44,7 @@ stage('build ') {
             steps {
                sh '''
                cd $WORKSPACE/DEV
-           docker build -t devopseasylearning2021/canary:${BUILD_NUMBER} .
+           docker build -t linsay1999/canary:${BUILD_NUMBER} .
                '''
             }
         }
@@ -57,16 +57,16 @@ stage('build ') {
    post {
    
    success {
-      slackSend (channel: '#development-alerts', color: 'good', message: "SUCCESSFUL: CANARY Branch name  <<${env.BRANCH_NAME}>>  Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+      slackSend (channel: '#aldevops', color: 'good', message: "SUCCESSFUL: CANARY Branch name  <<${env.BRANCH_NAME}>>  Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
     }
 
  
     unstable {
-      slackSend (channel: '#development-alerts', color: 'warning', message: "UNSTABLE: CANARY Branch name  <<${env.BRANCH_NAME}>>  Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+      slackSend (channel: '#aldevops', color: 'warning', message: "UNSTABLE: CANARY Branch name  <<${env.BRANCH_NAME}>>  Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
     }
 
     failure {
-      slackSend (channel: '#development-alerts', color: '#FF0000', message: "FAILURE:  CANARY Branch name  <<${env.BRANCH_NAME}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+      slackSend (channel: '#aldevops', color: '#FF0000', message: "FAILURE:  CANARY Branch name  <<${env.BRANCH_NAME}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
     }
    
     cleanup {
