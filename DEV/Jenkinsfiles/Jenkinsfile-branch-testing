@@ -1,17 +1,15 @@
 pipeline {
     agent { 
-        label 'node-jenkins'
+        label 'linode-node'
          }
-   
-  
+     
     options { buildDiscarder(logRotator(artifactDaysToKeepStr: '',
      artifactNumToKeepStr: '', daysToKeepStr: '3', numToKeepStr: '5'))
       disableConcurrentBuilds() }
       
        environment {
-		DOCKERHUB_CREDENTIALS=credentials('dockerhub')
+		DOCKERHUB_CREDENTIALS=credentials('aldockerhub')
 	}
-
 
     stages {
 
@@ -31,31 +29,19 @@ pipeline {
                 }
             }
         }
-
-
- stage(' cloning') {
-   
-
-            steps {
+ stage(' Cloning The Code') {
+               steps {
                sh '''
                rm -rf ./*
-	       git clone -b $BranchName https://github.com/linsdevopseasylearning/S2-pipeline01.git
-         mv  S2-pipeline01/* .
-         rm -rf S2-pipeline01
+	              git clone -b $BranchName https://github.com/linsay1999/alfred-S2-pipeline01.git
+               mv  alfred-S2-pipeline01/* .
+               rm -rf alfred-S2-pipeline01
                '''
             }
         }
-
-
-
-
-
-
-
-       stage('SonarQube analysis') {
+ stage('SonarQube analysis') {
             agent {
                 docker {
-
                   image 'sonarsource/sonar-scanner-cli:4.7.0'
                 }
                }
@@ -69,78 +55,63 @@ pipeline {
                 }
             }
         }
-
-
-          stage("Quality Gate") {
+stage("Quality Gate") {
             steps {
               timeout(time: 3, unit: 'MINUTES') {
                 waitForQualityGate abortPipeline: true
               }
             }
           }
-
-stage('build ') {
-
+stage('Code Build ') {
             steps {
                sh '''
                ls -l
                cd DEV
-           docker build -t devopseasylearning2021/canary:${BUILD_NUMBER} .
+               docker build -t linsay1999:/canary:${BUILD_NUMBER} .
                '''
             }
         }
-       
-
-
-    stage('Deploy with docker ') {
+stage('Deploy with docker ') {
             steps {
                sh '''
-rm -rf docker-compose.yml
-cat <<EOF > docker-compose.yml
-version: "3.3"
-services:
-  canary:
-    image: devopseasylearning2021/canary:${BUILD_NUMBER} 
-    expose:
-      - 80
-    ports:
-      - "9090:80"
-    hostname: canary
-    container_name: canary
-    restart: always 
-EOF
+               rm -rf docker-compose.yml
+               cat <<EOF > docker-compose.yml
+               version: "3.3"
+               services:
+               canary:
+               image: linsay1999/canary:${BUILD_NUMBER} 
+               expose:
+               - 80
+               ports:
+                - "9090:80"
+               hostname: canary
+               container_name: canary
+               restart: always 
+               EOF
 
 ls -l 
 cat docker-compose.yml 
 docker-compose up -d
 docker-compose ps 
-
-
-               curl ifconfig.co 
+               ifconfig eth0 | grep -w "inet" | tr -s " " | cut -f3 -d" "
                 '''
             }
         }
 
-
-
-
-
     }
             
-
    post {
    
    success {
-      slackSend (channel: '#development-alerts', color: 'good', message: "SUCCESSFUL: Application CANARY the Branch tested is  $BranchName Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+      slackSend (channel: '#aldevops', color: 'good', message: "SUCCESSFUL: Application CANARY the Branch tested is  $BranchName Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
     }
-
  
     unstable {
-      slackSend (channel: '#development-alerts', color: 'warning', message: "UNSTABLE: Application CANARY the Branch tested is  $BranchName Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+      slackSend (channel: '#aldevops', color: 'warning', message: "UNSTABLE: Application CANARY the Branch tested is  $BranchName Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
     }
 
     failure {
-      slackSend (channel: '#development-alerts', color: '#FF0000', message: "FAILURE: Application CANARY the Branch tested is  $BranchNameJob '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+      slackSend (channel: '#aldevops', color: '#FF0000', message: "FAILURE: Application CANARY the Branch tested is  $BranchNameJob '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
     }
    
     cleanup {
@@ -156,7 +127,6 @@ docker-compose ps
 
 
     }
-
 
 
 
