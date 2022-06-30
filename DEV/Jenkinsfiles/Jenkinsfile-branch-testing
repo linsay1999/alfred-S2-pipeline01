@@ -1,7 +1,7 @@
 pipeline {
-    agent { 
-        label 'linode-node'
-         }
+    agent any
+        
+        
      
     options { buildDiscarder(logRotator(artifactDaysToKeepStr: '',
      artifactNumToKeepStr: '', daysToKeepStr: '3', numToKeepStr: '5'))
