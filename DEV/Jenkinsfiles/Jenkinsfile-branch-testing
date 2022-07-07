@@ -99,8 +99,6 @@ docker-compose ps
                 '''
             }
         }
-
-    //}
             
    post {
    
