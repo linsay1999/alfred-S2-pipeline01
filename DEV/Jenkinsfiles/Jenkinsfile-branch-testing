@@ -100,7 +100,7 @@ docker-compose ps
             }
         }
 
-    }
+    //}
             
    post {
    
@@ -129,7 +129,6 @@ docker-compose ps
 
 
     }
-
 
 
 
