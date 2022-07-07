@@ -1,6 +1,6 @@
 pipeline {
     agent { 
-        label 'linode-node'
+        label 'docker-agent'
          }
    
   
@@ -12,8 +12,9 @@ pipeline {
     stages {
 
        stage('SonarQube analysis') {
-            agent {
-                docker {
+            agent { 
+        label 'docker-agent'
+         }
 
                   image 'sonarsource/sonar-scanner-cli:4.7.0'
                 }
